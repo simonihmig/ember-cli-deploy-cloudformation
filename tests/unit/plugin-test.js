@@ -2,7 +2,7 @@
 'use strict';
 
 const subject = require('../../index');
-const assert  = require('../helpers/assert');
+const { expect } = require('chai');
 
 describe('Cloudformation plugin', function() {
   it('has a name', function() {
@@ -10,7 +10,7 @@ describe('Cloudformation plugin', function() {
       name: 'cloudformation'
     });
 
-    assert.equal(instance.name, 'cloudformation');
+    expect(instance.name).to.equal('cloudformation');
   });
 
   it('implements the correct hooks', function() {
@@ -18,7 +18,7 @@ describe('Cloudformation plugin', function() {
       name: 'cloudformation'
     });
 
-    assert.isDefined(plugin.configure);
-    assert.isFunction(plugin.configure);
+    expect(plugin.configure).to.be.a.function;
+    expect(plugin.prepare).to.be.a.function;
   });
 });

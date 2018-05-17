@@ -1,7 +1,7 @@
 {
   "name": "ember-cli-deploy-cloudformation",
   "version": "0.0.0",
-  "description": "A brand new Ember CLI Deploy plugin",
+  "description": "An ember-cli-deploy plugin to create/update an AWS CloudFormation stack",
   "directories": {
     "doc": "doc",
     "test": "tests"
@@ -9,11 +9,11 @@
   "scripts": {
     "test": "node tests/runner.js && ./node_modules/.bin/eslint index.js tests/**/*.js"
   },
-  "repository": "",
+  "repository": "https://github.com/kaliber5/ember-cli-deploy-cloudformation",
   "engines": {
-    "node": ">= 4"
+    "node": ">= 6"
   },
-  "author": "",
+  "author": "Simon Ihmig <ihmig@kaliber5.de>",
   "license": "MIT",
   "dependencies": {
     "ember-cli-deploy-plugin": "^0.2.9",

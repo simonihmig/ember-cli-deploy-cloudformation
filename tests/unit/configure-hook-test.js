@@ -2,7 +2,7 @@
 'use strict';
 
 const subject = require('../../index');
-const assert  = require('../helpers/assert');
+const { expect } = require('chai');
 
 describe('Cloudformation | configure hook', function() {
   let mockUi;
@@ -28,48 +28,48 @@ describe('Cloudformation | configure hook', function() {
         ui: mockUi,
         config: {
           'cloudformation': {}
+        },
+        project: {
+          name() {
+            return 'myapp'
+          }
         }
       };
 
       instance.beforeHook(context);
 
-      assert.throws(function(){
-        instance.configure(context);
-      });
+      let msg = `Missing required config: either 'templateBody' or 'templateUrl' is required`;
 
-      let s = 'Missing required config: \`isInNeedOfSleep\`';
-      assert.match(mockUi.messages.pop(), new RegExp(s));
+      expect(() => instance.configure(context)).to.throw(msg);
+      expect(mockUi.messages.pop()).to.include(msg);
     });
   });
 
   describe('default config', function() {
-    let config;
-
-    beforeEach(function() {
-      config = {
-        isInNeedOfSleep: true,
-        meaningOfLife: 99
-      };
-    });
-
-    it('provides default meaning of life', function() {
+    it('provides default stackName', function() {
       let instance = subject.createDeployPlugin({
         name: 'cloudformation'
       });
 
-      delete config.meaningOfLife;
-
       let context = {
         ui: mockUi,
         config: {
-          'cloudformation': config
-        }
+          cloudformation: {
+            templateBody: 'dummy'
+          }
+        },
+        project: {
+          name() {
+            return 'myapp'
+          }
+        },
+        deployTarget: 'production'
       };
 
       instance.beforeHook(context);
       instance.configure(context);
 
-      assert.equal(instance.readConfig('meaningOfLife'), 42);
+      expect(instance.readConfig('stackName')).to.equal('myapp-production');
     });
   });
 });

@@ -17,10 +17,8 @@ module.exports = {
        * http://ember-cli-deploy.com/docs/v1.0.x/creating-a-plugin/#validating-plugin-config
        */
 
-      defaultConfig: {
-        meaningOfLife: 42 // Example default config. Remove this.
-      },
-      requiredConfig: ['isInNeedOfSleep'], // Example required config. Remove this;
+      defaultConfig: {},
+      requiredConfig: [],
 
       /*
        * Implement any pipeline hooks here
@@ -28,9 +26,19 @@ module.exports = {
        * http://ember-cli-deploy.com/docs/v1.0.x/pipeline-hooks/
        */
 
-      //configure(context) {
-      //  let configProp = this.readConfig('foo'); // this is how you access plugin config
-      //},
+      configure(context) {
+        this.defaultConfig.stackName = `${context.project.name()}-${context.deployTarget}`;
+        this._super.configure.apply(this, arguments);
+
+        let templateBody = this.readConfig('templateBody');
+        let templateUrl = this.readConfig('templateUrl');
+
+        if (!templateBody && !templateUrl) {
+          let message = `Missing required config: either 'templateBody' or 'templateUrl' is required`;
+          this.log(message, { color: 'red' });
+          throw new Error(message);
+        }
+      },
 
       //setup(context) {
       //  // Return an object with values you'd like merged in to the context to be accessed by other pipeline hooks and plugins
