@@ -1,6 +1,7 @@
 /*eslint-env node*/
 'use strict';
 
+const fs = require('fs');
 const chai = require('chai');
 const chaiAsPromised = require("chai-as-promised");
 const sinon = require('sinon');
@@ -12,12 +13,14 @@ const { expect } = chai;
 chai.use(chaiAsPromised);
 chai.use(chaiSinon);
 
+const templatePath = 'tests/fixtures/cfn.yaml';
+
 const options = {
   accessKeyId: 'abc',
   secretAccessKey: 'def',
   region: 'us-east-1',
   stackName: 'myStack',
-  templateBody: 'template',
+  templateBody: `file://${templatePath}`,
   parameters: {
     key1: 'val1',
     key2: 'val2'
@@ -38,9 +41,11 @@ const options = {
   }
 };
 
+const templateBody = fs.readFileSync(templatePath, { encoding: 'utf8' });
+
 const expectedOptions = {
   StackName: 'myStack',
-  TemplateBody: 'template',
+  TemplateBody: templateBody,
   Parameters: [
     {
       ParameterKey: 'key1',
@@ -104,6 +109,9 @@ describe('Cloudformation client', function() {
     });
     sinon.stub(client.awsClient, 'describeStacks').returns({
       promise: sinon.fake.resolves(describeData)
+    });
+    sinon.stub(client.awsClient, 'validateTemplate').returns({
+      promise: sinon.fake.resolves()
     });
   });
 
@@ -185,6 +193,29 @@ describe('Cloudformation client', function() {
 
   describe('updateStack', function() {
     checkUpdateStack(() => client.updateStack());
+  });
+
+  describe('validateTemplate', function() {
+    it('resolves for valid template', function() {
+      return expect(client.validateTemplate()).to.be.fulfilled
+        .then(() => {
+          expect(client.awsClient.validateTemplate).to.have.been.calledWith({
+            TemplateBody: templateBody
+          })
+        });
+    });
+
+    it('rejects for invalid template', function() {
+      client.awsClient.validateTemplate.returns({
+        promise: sinon.fake.rejects('template error')
+      });
+      return expect(client.validateTemplate()).to.be.rejected
+        .then(() => {
+          expect(client.awsClient.validateTemplate).to.have.been.calledWith({
+            TemplateBody: templateBody
+          })
+        });
+    });
   });
 
   describe('stackExists', function() {
