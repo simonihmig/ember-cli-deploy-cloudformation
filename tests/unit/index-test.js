@@ -1,12 +1,26 @@
 /*eslint-env node*/
 'use strict';
 
+const CfnClient = require('../../lib/cfn');
 const chai = require('chai');
 const chaiAsPromised = require("chai-as-promised");
+const chaiSinon = require('sinon-chai');
 const subject = require('../../index');
+const sinon = require('sinon');
 const { expect } = chai;
 
 chai.use(chaiAsPromised);
+chai.use(chaiSinon);
+
+const expectedOutputs = {
+  AssetsBucket: 'abc-123456789',
+  CloudFrontDistribution: 'EFG123456789'
+};
+
+const pluginOptions = {
+  templateBody: 'dummy',
+  region: 'eu-central-1'
+};
 
 describe('Cloudformation plugin', function() {
   let mockUi;
@@ -15,11 +29,6 @@ describe('Cloudformation plugin', function() {
   let context;
 
   beforeEach(function() {
-    cfnClient = {
-      validateTemplate() {
-        return Promise.resolve();
-      }
-    };
     mockUi = {
       verbose: true,
       messages: [],
@@ -33,11 +42,7 @@ describe('Cloudformation plugin', function() {
     context = {
       ui: mockUi,
       config: {
-        cloudformation: {
-          templateBody: 'dummy',
-          region: 'eu-central-1',
-          cfnClient
-        }
+        cloudformation: Object.assign({}, pluginOptions)
       },
       project: {
         name() {
@@ -50,6 +55,16 @@ describe('Cloudformation plugin', function() {
     instance = subject.createDeployPlugin({
       name: 'cloudformation'
     });
+
+    cfnClient = new CfnClient(context.config.cloudformation);
+    context.config.cloudformation.cfnClient = cfnClient;
+    sinon.stub(cfnClient, 'validateTemplate').resolves();
+    sinon.stub(cfnClient, 'createOrUpdateStack').resolves();
+    sinon.stub(cfnClient, 'fetchOutputs').resolves(expectedOutputs);
+  });
+
+  afterEach(function() {
+    sinon.restore();
   });
 
   it('has a name', function() {
@@ -93,9 +108,14 @@ describe('Cloudformation plugin', function() {
   });
 
   describe('setup', function() {
+    it('resolves', function() {
+      instance.beforeHook(context);
+      return expect(instance.setup(context)).to.be.fulfilled;
+    });
+
     it('errors on invalid template', function() {
       let msg = 'invalid template';
-      cfnClient.validateTemplate = () => Promise.reject(msg);
+      cfnClient.validateTemplate.rejects(msg);
 
       instance.beforeHook(context);
 
@@ -103,6 +123,27 @@ describe('Cloudformation plugin', function() {
         .then(() => expect(mockUi.messages.pop()).to.include(msg));
     });
 
+  });
+
+  describe('prepare', function() {
+    it('creates or updates stack', function() {
+      instance.beforeHook(context);
+      instance.setup(context);
+      return expect(instance.prepare(context)).to.be.fulfilled
+        .then(() => {
+          expect(cfnClient.createOrUpdateStack).to.have.been.calledOnce;
+        })
+    });
+
+    it('adds outputs to context', function() {
+      instance.beforeHook(context);
+      instance.setup(context);
+      return expect(instance.prepare(context)).to.be.fulfilled
+        .then(() => {
+          expect(context.cloudformation).to.exist;
+          expect(context.cloudformation).to.have.property('outputs', expectedOutputs);
+        })
+    });
   });
 
 });

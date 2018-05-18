@@ -5,15 +5,6 @@
 const DeployPluginBase = require('ember-cli-deploy-plugin');
 const CfnClient = require('./lib/cfn');
 
-const optionKeys = [
-  'accessKeyId',
-  'secretAccessKey',
-  'region',
-  'templateBody',
-  'templateUrl',
-  'stackName'
-];
-
 module.exports = {
   name: 'ember-cli-deploy-cloudformation',
 
@@ -39,7 +30,7 @@ module.exports = {
       },
 
       setup() {
-        let options = optionKeys
+        let options = Object.keys(this.pluginConfig)
           .map((key) => ({ [key]: this.readConfig(key)}))
           .reduce((result, item) => Object.assign(result, item), {});
 
