@@ -73,6 +73,21 @@ const expectedOptions = {
   }
 };
 
+const describeData = {
+  StackName: 'myStack',
+  StackStatus: 'CREATE_COMPLETE',
+  Outputs: [
+    {
+      OutputKey: 'AssetsBucket',
+      OutputValue: 'abc-123456789'
+    },
+    {
+      OutputKey: 'CloudFrontDistribution',
+      OutputValue: 'EFG123456789'
+    }
+  ]
+};
+
 describe('Cloudformation client', function() {
   let client;
 
@@ -88,7 +103,7 @@ describe('Cloudformation client', function() {
       promise: sinon.fake.resolves()
     });
     sinon.stub(client.awsClient, 'describeStacks').returns({
-      promise: sinon.fake.resolves()
+      promise: sinon.fake.resolves(describeData)
     });
   });
 
@@ -200,6 +215,15 @@ describe('Cloudformation client', function() {
       });
 
       checkUpdateStack(() => client.createOrUpdateStack());
+    });
+  });
+
+  describe('fetchOutputs', function() {
+    it('returns adjusted output hash', function() {
+      return expect(client.fetchOutputs()).to.eventually.deep.equal({
+        AssetsBucket: 'abc-123456789',
+        CloudFrontDistribution: 'EFG123456789'
+      });
     });
   });
 

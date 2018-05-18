@@ -21,27 +21,8 @@ module.exports = {
     let DeployPlugin = DeployPluginBase.extend({
       name: options.name,
 
-      /*
-       * Define any config validation here
-       *
-       * http://ember-cli-deploy.com/docs/v1.0.x/creating-a-plugin/#validating-plugin-config
-       */
-
-      defaultConfig: {
-        cfnClient(context) {
-          return context.cfnClient;
-        },
-        // awsCloudFormationClient(context) {
-        //   return context.awsCloudFormationClient; // if you want to provide your own CloudFormation client to be used instead of one from aws-sdk
-        // }
-      },
+      defaultConfig: {},
       requiredConfig: [],
-
-      /*
-       * Implement any pipeline hooks here
-       *
-       * http://ember-cli-deploy.com/docs/v1.0.x/pipeline-hooks/
-       */
 
       configure(context) {
         this.defaultConfig.stackName = `${context.project.name()}-${context.deployTarget}`;
@@ -68,6 +49,17 @@ module.exports = {
           .catch(this._errorMessage.bind(this));
       },
 
+      prepare(context) {
+        return this.cfnClient.createOrUpdateStack()
+          .then(() => this.cfnClient.fetchOutputs())
+          .then(outputs => {
+            context.cloudformation = {
+              outputs
+            };
+          })
+          .catch(this._errorMessage.bind(this));
+      },
+
       _errorMessage(error) {
         this.log(error, { color: 'red' });
         if (error && error.stack) {
@@ -75,33 +67,6 @@ module.exports = {
         }
         return Promise.reject(error);
       }
-
-      //willDeploy(context) {
-      //  return RSVP.resolve(); // Return a promise if you'd like the pipeline to wait until the hook has performed some function
-      //},
-
-      //willBuild(context) {},
-      //build(context) {},
-      //didBuild(context) {},
-
-      //willPrepare(context) {},
-      //prepare(context) {},
-      //didPrepare(context) {},
-
-      //willUpload(context) {},
-      //upload(context) {},
-      //didUpload(context) {},
-
-      //willActivate(context) {},
-      //activate(context) {},
-      //didActivate(context) {},
-
-      //fetchInitialRevisions(context) {},
-      //fetchRevisions(context) {},
-
-      //didDeploy(context) {},
-
-      //teardown(context) {},
     });
 
     return new DeployPlugin();
