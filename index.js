@@ -4,6 +4,7 @@
 //const RSVP = require('rsvp');
 const DeployPluginBase = require('ember-cli-deploy-plugin');
 const CfnClient = require('./lib/cfn');
+const Logger = require('./lib/logger');
 
 module.exports = {
   name: 'ember-cli-deploy-cloudformation',
@@ -35,6 +36,7 @@ module.exports = {
           .reduce((result, item) => Object.assign(result, item), {});
 
         this.cfnClient = this.readConfig('cfnClient') || new CfnClient(options);
+        this.cfnClient.logger = new Logger(this.log.bind(this));
 
         return this.cfnClient.validateTemplate()
           .catch(this._errorMessage.bind(this));

@@ -81,22 +81,25 @@ const expectedOptions = {
 };
 
 const describeData = {
-  StackName: 'myStack',
-  StackStatus: 'CREATE_COMPLETE',
-  Outputs: [
-    {
-      OutputKey: 'AssetsBucket',
-      OutputValue: 'abc-123456789'
-    },
-    {
-      OutputKey: 'CloudFrontDistribution',
-      OutputValue: 'EFG123456789'
-    }
-  ]
+  Stacks: [{
+    StackName: 'myStack',
+    StackStatus: 'CREATE_COMPLETE',
+    Outputs: [
+      {
+        OutputKey: 'AssetsBucket',
+        OutputValue: 'abc-123456789'
+      },
+      {
+        OutputKey: 'CloudFrontDistribution',
+        OutputValue: 'EFG123456789'
+      }
+    ]
+  }]
 };
 
 describe('Cloudformation client', function() {
   let client;
+  let logger;
 
   beforeEach(function() {
     client = new CfnClient(options);
@@ -115,6 +118,15 @@ describe('Cloudformation client', function() {
     sinon.stub(client.awsClient, 'validateTemplate').returns({
       promise: sinon.fake.resolves()
     });
+
+    // minimal logger interface
+    logger = {
+      log: sinon.fake(),
+      error: sinon.fake(),
+      debug: sinon.fake()
+    };
+
+    client.logger = logger;
   });
 
   afterEach(function() {
@@ -134,6 +146,7 @@ describe('Cloudformation client', function() {
 
     expect(constructor).to.always.have.been.calledWithNew;
     expect(constructor).to.have.been.calledWith({
+      apiVersion: '2010-05-15',
       accessKeyId: 'abc',
       secretAccessKey: 'def',
       region: 'us-east-1'
@@ -148,7 +161,12 @@ describe('Cloudformation client', function() {
 
     it('it waits for stackCreateComplete', function() {
       return expect(callFn()).to.be.fulfilled
-        .then(() => expect(client.awsClient.waitFor).to.have.been.calledWith('stackCreateComplete', { StackName: 'myStack' }));
+        .then(() => {
+          expect(client.awsClient.waitFor).to.have.been.calledWith('stackCreateComplete', { StackName: 'myStack' });
+          expect(logger.debug).to.have.been.calledWith(`Creating new CloudFormation stack 'myStack'...`);
+          expect(logger.log).to.have.been.calledWith(`New CloudFormation stack 'myStack' has been created!`);
+          expect(logger.debug).to.have.been.calledBefore(logger.log);
+        });
     });
 
     it('rejects when createStack fails', function() {
@@ -168,7 +186,12 @@ describe('Cloudformation client', function() {
 
     it('it waits for stackUpdateComplete', function() {
       return expect(callFn()).to.be.fulfilled
-        .then(() => expect(client.awsClient.waitFor).to.have.been.calledWith('stackUpdateComplete', { StackName: 'myStack' }));
+        .then(() => {
+          expect(client.awsClient.waitFor).to.have.been.calledWith('stackUpdateComplete', { StackName: 'myStack' });
+          expect(logger.debug).to.have.been.calledWith(`Updating CloudFormation stack 'myStack'...`);
+          expect(logger.log).to.have.been.calledWith(`CloudFormation stack 'myStack' has been updated!`);
+          expect(logger.debug).to.have.been.calledBefore(logger.log);
+        });
     });
 
     it('rejects when updateStack fails', function() {
@@ -185,7 +208,10 @@ describe('Cloudformation client', function() {
       });
 
       return expect(callFn()).to.be.fulfilled
-        .then(() => expect(client.awsClient.waitFor).to.not.have.been.called);
+        .then(() => {
+          expect(client.awsClient.waitFor).to.not.have.been.called;
+          expect(logger.debug).to.have.been.calledWith(`No updates are to be performed to CloudFormation stack 'myStack'`);
+        });
     });
   }
 
@@ -257,6 +283,16 @@ describe('Cloudformation client', function() {
         AssetsBucket: 'abc-123456789',
         CloudFrontDistribution: 'EFG123456789'
       });
+    });
+
+    it('returns empty hash when no outputs are found', function() {
+      let emptyDescribeData = JSON.parse(JSON.stringify(describeData));
+      delete emptyDescribeData.Stacks[0].Outputs;
+      client.awsClient.describeStacks.returns({
+        promise: sinon.fake.resolves(emptyDescribeData)
+      });
+
+      return expect(client.fetchOutputs()).to.eventually.deep.equal({});
     });
   });
 
