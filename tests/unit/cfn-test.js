@@ -23,7 +23,8 @@ const options = {
   templateBody: `file://${templatePath}`,
   parameters: {
     key1: 'val1',
-    key2: 'val2'
+    key2: 'val2',
+    key3: undefined
   },
   capabilities: ['CAPABILITY_IAM'],
   resourceTypes: ['AWS::*'],
@@ -38,7 +39,8 @@ const options = {
   disableRollback: true,
   rollbackConfiguration: {
     MonitoringTimeInMinutes: 10
-  }
+  },
+  dummy: undefined
 };
 
 const templateBody = fs.readFileSync(templatePath, { encoding: 'utf8' });
