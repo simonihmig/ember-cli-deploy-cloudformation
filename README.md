@@ -2,31 +2,47 @@
 
 > An Ember CLI Deploy plugin to create/update an AWS CloudFormation stack before deploying to it
 
-[TODO] You could write a short summary of your plugin here
+## Introduction
 
-## What is an Ember CLI Deploy plugin?
+### What is CloudFormation?
 
-A plugin is an addon that can be executed as a part of the Ember CLI Deploy pipeline. A plugin will implement one or more of the Ember CLI Deploy's pipeline hooks.
+AWS CloudFormation is Amazon's implementation of [infrastructure as code][6], which lets you create, update, provision
+and delete stacks of AWS resources (e.g. EC2 instances, S3 buckets, CloudFront distributions etc.), described by a single 
+configuration file.
 
-For more information on what plugins are and how they work, please refer to the [Plugin Documentation][1].
+For details on how CloudFormation works and how to write a template file, please visit the official
+[CloudFormation Documentation][7]
 
-## Quick Start
+### What does this plugin do?
 
-- Install this plugin
+This is an Ember CLI addon that adds a plugin to the Ember CLI Deploy pipeline to create or update a CloudFormation
+stack as part of the Ember CLI Deploy pipeline. It does not actually deploy any artefacts itself, this is where any of
+the existing plugins that work with AWS resources come into play. Here are some that should work just fine:  
 
-```bash
-$ ember install ember-cli-deploy-cloudformation
-```
+* [`ember-cli-deploy-s3`](https://github.com/ember-cli-deploy/ember-cli-deploy-s3)
+* [`ember-cli-deploy-s3-index`](https://github.com/ember-cli-deploy/ember-cli-deploy-s3-index)
+* [`ember-cli-deploy-s3-pack`](https://github.com/Gaurav0/ember-cli-deploy-s3-pack)
+* [`ember-cli-deploy-cloudfront`](https://github.com/kpfefferle/ember-cli-deploy-cloudfront)
+* [`ember-cli-deploy-elastic-beanstalk`](https://github.com/tomdale/ember-cli-deploy-elastic-beanstalk)
+* [`ember-cli-deploy-fastboot-app-server-aws`](https://github.com/ember-cli-deploy/ember-cli-deploy-fastboot-app-server-aws)
 
-[TODO] You could add some sensible default config examples needed to quickly run your plugin
+This allows you to create the AWS resources and deploy your app to them in one single `ember deploy` command. 
+For example you could easily deploy a feature branch to a new staging environment just for this feature and delete it 
+afterwards, without any manual setup work.
 
-- Run the pipeline
+### Why not use the AWS CLI directly?
 
-```bash
-$ ember deploy
-```
+The AWS CLI allows you to interact with CloudFormation, but suffers from a few caveats when integration it into a
+CI/CD pipeline:
+
+* on the first run of the pipeline you need to create the stack, while you need to update it for all following
+deployments.
+* an update run without any changes to the stack is treated as an error by the CLI.
+* there is no easy way to pass the outputs of the template (e.g. the name of a created S3 bucket) to any following
+deployment steps.
 
 ## Installation
+
 Run the following command in your terminal:
 
 ```bash
@@ -35,7 +51,7 @@ ember install ember-cli-deploy-cloudformation
 
 ## Configuration 
 
-The configurations of this plugin take place in three steps:
+The configuration of this plugin takes place in three steps:
 
 ### 1. Create a CloudFormation template
 
@@ -76,7 +92,35 @@ Here is an example of a configuration. It uses environment variables to inject a
 
 ### 3. Pipe outputs to other plugins
 
-[TODO]
+A CloudFormation template let's you define so called "Outputs". These are commonly values, which were not available before 
+creating the stack. So for example these could be some resource properties, like the name of an S3 bucket created by 
+CloudFormation or the URL of a CloudFront distribution. 
+
+Some of these you will have to pass to other Ember CLI Deploy plugins, so they can actually deploy your app to the
+infrastructure that CloudFormation has created for you. A common example would be to pass the S3 bucket to 
+`ember-cli-deploy-s3`.
+
+This plugin will write all outputs of the processed template to the [Ember CLI Deploy context][4], at the path
+`cloudformation.outputs` as simple hash with the name of the output as the key. As Ember CLI Deploy allow you to 
+configure plugins not only with static values, but also with functions that receive the context, you can easily
+pass the outputs to any other plugin. Here the afore-mentioned S3 plugin will receive the name of the bucket, that was
+defined in the CloudFormation template output as `AssetsBucket`:
+
+```js
+{
+  cloudformation: {
+    ...
+  },
+  s3: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    bucket(context) {
+      return context.cloudformation.outputs.AssetsBucket;
+    },
+    region: 'eu-central-1'
+  }
+}
+```
 
 ### Configuration Options
 
@@ -113,7 +157,7 @@ Moreover all parameters supported by the AWS CloudFormation SDK will be passed w
 
 > Note: the plugin will let you write parameters in the more usual camelcase style, and map them to the pascal case 
 style that AWS expects. So instead of writing `StackName`, you can use `stackName`. Also for the `tags` and `parameters`
-properties, specify them as normal JavaScript hashes (e.g. `tags: { key: 'value' }`) instead of the unusual AWS syntax! 
+properties, specify them as normal JavaScript hashes (e.g. `tags: { key: 'value' }`) instead of the original AWS syntax! 
 
 Here is a list of the commonly used CloudFormation parameters:
 
@@ -171,4 +215,7 @@ Since this is a node-only Ember CLI addon, we use mocha for testing and this pac
 [1]: http://ember-cli-deploy.com/plugins/ "Plugin Documentation"
 [2]: https://aws.amazon.com/documentation/cloudformation/ "AWS CloudFormation Documentation"
 [3]: https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/CloudFormation.html#createStack-property "AWS parameters"
+[4]: http://ember-cli-deploy.com/docs/v1.0.x/the-deployment-context/ "Ember CLI Deploy context"
 [5]: https://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html#Setting_AWS_Credentials "Setting AWS Credentials"
+[6]: https://en.wikipedia.org/wiki/Infrastructure_as_Code
+[7]: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html
