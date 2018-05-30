@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  DomainName:
+    Description: 'Domain name of the CDN, e.g. assets.example.com'
+    Type: String
+  CFCertificate:
+    Description: 'Existing ACM Certificate ARN for CloudFront. Must be created in the us-east-1 region!'
+    Type: String
+  ForceHttps:
+    Type: String
+    Description: Force HTTPS by redirecting HTTP requests
+    Default: '0'
+    AllowedValues:
+      - 0
+      - 1
+
+Conditions:
+  HasForceHttps: !Equals [ !Ref ForceHttps, '1' ]
+Resources:
+  AssetsBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      WebsiteConfiguration:
+        IndexDocument: 'index.html'
+  S3BucketPolicy:
+      Type: 'AWS::S3::BucketPolicy'
+      Properties:
+        Bucket: !Ref AssetsBucket
+        PolicyDocument:
+          Statement:
+          - Action:
+            - 's3:GetObject'
+            Effect: Allow
+            Resource:
+            - !Sub 'arn:aws:s3:::${AssetsBucket}/*'
+            Principal: '*'
+          - Action:
+            - 's3:ListBucket'
+            Effect: Allow
+            Resource:
+            - !GetAtt 'AssetsBucket.Arn'
+            Principal: '*'
+  AssetsCDN:
+    Type: 'AWS::CloudFront::Distribution'
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName: !GetAtt
+              - AssetsBucket
+              - DomainName
+            Id: AssetsBucket
+            S3OriginConfig: {}
+        Enabled: true
+        HttpVersion: http2
+        Aliases:
+          - !Ref DomainName
+        DefaultCacheBehavior:
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+          TargetOriginId: AssetsBucket
+          ViewerProtocolPolicy: !If [HasForceHttps, 'redirect-to-https', 'allow-all']
+        ViewerCertificate:
+          AcmCertificateArn: !Ref CFCertificate
+          SslSupportMethod: sni-only
+        PriceClass: PriceClass_100
+        CustomErrorResponses:
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: '/index.html'
+        DefaultRootObject: 'index.html'
+
+Outputs:
+  AssetsBucket:
+    Value: !Ref AssetsBucket
+  CloudFrontDistribution:
+    Value: !Ref AssetsCDN
+  CloudFrontDomainName:
+    Value: !GetAtt 'AssetsCDN.DomainName'
