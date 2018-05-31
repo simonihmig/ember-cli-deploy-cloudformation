@@ -15,7 +15,8 @@ and delete stacks of AWS resources (e.g. EC2 instances, S3 buckets, CloudFront d
 configuration file.
 
 For details on how CloudFormation works and how to write a template file, please visit the official
-[CloudFormation Documentation][7]
+[CloudFormation Documentation][7]. Also check the [Examples section](#examples) for some example configurations for
+common Ember deployment scenarios.
 
 ### What does this plugin do?
 
@@ -36,7 +37,7 @@ afterwards, without any manual setup work.
 
 ### Why not use the AWS CLI directly?
 
-The AWS CLI allows you to interact with CloudFormation, but suffers from a few caveats when integration it into a
+The AWS CLI allows you to interact with CloudFormation, but suffers from a few caveats when integrating it into a
 CI/CD pipeline:
 
 * on the first run of the pipeline you need to create the stack, while you need to update it for all following
@@ -52,6 +53,17 @@ Run the following command in your terminal:
 ```bash
 ember install ember-cli-deploy-cloudformation
 ```
+
+## Examples
+
+Ember is about shared solutions to common problems. And this applies here as well. Instead of figuring all the details
+of a useful CloudFormation stack, this section will feature a few examples to get you going quickly:
+
+* [S3 + CloudFront](examples/S3+CloudFront)
+With a custom domain name (self hosted) and SSL
+
+*This section is still a work in progess. If you have some templates you can share, please submit a PR so others can
+benefit from your experience as well!*
 
 ## Configuration 
 
@@ -125,18 +137,6 @@ defined in the CloudFormation template output as `AssetsBucket`:
   }
 }
 ```
-
-### Examples
-
-Ember is about shared solutions to common problems. And this applies here as well. Instead of figuring all the details
-of a useful CloudFormation stack, this section will feature a few example to get you going quickly:
-
-* [S3 + CloudFront](examples/S3+CloudFront)
-  With a custom domain name (self hosted) and SSL
-
-*This section is still a work in progess. If you have some templates you can share, please submit a PR so others can
-benefit from your experience as well!*
-
 
 ### Configuration Options
 
@@ -219,19 +219,3 @@ parameters: {
 ```
 
 *Default:* `undefined`
-
-## Tests
-
-* yarn test
-
-## Why `ember test` doesn't work
-
-Since this is a node-only Ember CLI addon, we use mocha for testing and this package does not include many files and devDependencies which are part of Ember CLI's typical `ember test` processes.
-
-[1]: http://ember-cli-deploy.com/plugins/ "Plugin Documentation"
-[2]: https://aws.amazon.com/documentation/cloudformation/ "AWS CloudFormation Documentation"
-[3]: https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/CloudFormation.html#createStack-property "AWS parameters"
-[4]: http://ember-cli-deploy.com/docs/v1.0.x/the-deployment-context/ "Ember CLI Deploy context"
-[5]: https://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html#Setting_AWS_Credentials "Setting AWS Credentials"
-[6]: https://en.wikipedia.org/wiki/Infrastructure_as_Code
-[7]: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html
