@@ -126,6 +126,18 @@ defined in the CloudFormation template output as `AssetsBucket`:
 }
 ```
 
+### Examples
+
+Ember is about shared solutions to common problems. And this applies here as well. Instead of figuring all the details
+of a useful CloudFormation stack, this section will feature a few example to get you going quickly:
+
+* [S3 + CloudFront](examples/S3+CloudFront)
+  With a custom domain name (self hosted) and SSL
+
+*This section is still a work in progess. If you have some templates you can share, please submit a PR so others can
+benefit from your experience as well!*
+
+
 ### Configuration Options
 
 #### accessKeyId

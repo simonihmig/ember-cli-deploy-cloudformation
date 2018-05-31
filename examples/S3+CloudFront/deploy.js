@@ -18,12 +18,12 @@ module.exports = function(deployTarget) {
       accessKeyId: process.env.AWS_ACCESS_KEY_ID,             // SET THE ENV VAR
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,     // SET THE ENV VAR
       region: 'us-east-1',
-      stackName: `myApp-${deployTarget}`,                     // REPLACE THIS!
+      stackName: `${require('../package.json').name}-${deployTarget}`,
       templateBody: 'file://cfn.yaml',
       capabilities: ['CAPABILITY_IAM'],
       parameters: {
         DomainName: process.env.CFN_DOMAINNAME,               // SET THE ENV VAR OR REPLACE!
-        CFCertificate: 'ARN_OF_SSL_CERTIfiCATE'               // REPLACE THIS!
+        CFCertificate: process.env.CFN_CFCERTIFICATE          // SET THE ENV VAR OR REPLACE!
       }
     },
     s3: {
