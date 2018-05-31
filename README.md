@@ -10,7 +10,7 @@
 
 ### What is CloudFormation?
 
-AWS CloudFormation is Amazon's implementation of [infrastructure as code][6], which lets you create, update, provision
+[AWS CloudFormation][9] is Amazon's implementation of [infrastructure as code][6], which lets you create, update, provision
 and delete stacks of AWS resources (e.g. EC2 instances, S3 buckets, CloudFront distributions etc.), described by a single 
 configuration file.
 
@@ -20,7 +20,7 @@ common Ember deployment scenarios.
 
 ### What does this plugin do?
 
-This is an Ember CLI addon that adds a plugin to the Ember CLI Deploy pipeline to create or update a CloudFormation
+This is an Ember CLI addon that adds a plugin to the [Ember CLI Deploy][8] pipeline to create or update a CloudFormation
 stack as part of the Ember CLI Deploy pipeline. It does not actually deploy any artefacts itself, this is where any of
 the existing plugins that work with AWS resources come into play. Here are some that should work just fine:  
 
@@ -82,7 +82,7 @@ Usually you will want to put this file under version control, so you can create 
 
 Add the required configuration to your `config/deploy.js`.
 
-See [Configuration Options](#Configuration Options) below for all available configuration options. 
+See [Configuration Options](#configuration-options) below for all available configuration options. 
 For detailed information on how configuration of plugins works, please refer to the [Plugin Documentation][1].
 
 #### Example
@@ -219,3 +219,14 @@ parameters: {
 ```
 
 *Default:* `undefined`
+
+
+[1]: http://ember-cli-deploy.com/plugins/ "Plugin Documentation"
+[2]: https://aws.amazon.com/documentation/cloudformation/ "AWS CloudFormation Documentation"
+[3]: https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/CloudFormation.html#createStack-property "AWS parameters"
+[4]: http://ember-cli-deploy.com/docs/v1.0.x/the-deployment-context/ "Ember CLI Deploy context"
+[5]: https://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html#Setting_AWS_Credentials "Setting AWS Credentials"
+[6]: https://en.wikipedia.org/wiki/Infrastructure_as_Code
+[7]: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html
+[8]: http://ember-cli-deploy.com/
+[9]: https://aws.amazon.com/cloudformation/
