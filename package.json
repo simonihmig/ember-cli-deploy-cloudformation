@@ -20,14 +20,14 @@
     "ember-cli-deploy-plugin": "^0.2.9"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "chai-as-promised": "^6.0.0",
-    "ember-cli": "^2.12.0",
-    "eslint": "^3.18.0",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "ember-cli": "^3.17.0",
+    "eslint": "^6.8.0",
     "glob": "^7.1.1",
-    "mocha": "^3.2.0",
-    "sinon": "^5.0.7",
-    "sinon-chai": "^3.0.0"
+    "mocha": "^7.1.1",
+    "sinon": "^9.0.1",
+    "sinon-chai": "^3.5.0"
   },
   "keywords": [
     "ember-addon",
