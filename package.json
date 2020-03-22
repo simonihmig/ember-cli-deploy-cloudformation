@@ -11,7 +11,7 @@
   },
   "repository": "https://github.com/kaliber5/ember-cli-deploy-cloudformation",
   "engines": {
-    "node": ">= 6"
+    "node": "10.x || >= 12"
   },
   "author": "Simon Ihmig <ihmig@kaliber5.de>",
   "license": "MIT",
