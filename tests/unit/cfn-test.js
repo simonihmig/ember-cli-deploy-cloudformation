@@ -154,19 +154,17 @@ describe('Cloudformation client', function() {
   });
 
   function checkCreateStack(callFn) {
-    it('it calls createStack with adjusted options', function() {
-      return expect(callFn()).to.be.fulfilled
-        .then(() => expect(client.awsClient.createStack).to.have.been.calledWith(expectedOptions));
+    it('it calls createStack with adjusted options', async function() {
+      await expect(callFn()).to.be.fulfilled;
+      expect(client.awsClient.createStack).to.have.been.calledWith(expectedOptions);
     });
 
-    it('it waits for stackCreateComplete', function() {
-      return expect(callFn()).to.be.fulfilled
-        .then(() => {
-          expect(client.awsClient.waitFor).to.have.been.calledWith('stackCreateComplete', { StackName: 'myStack' });
-          expect(logger.debug).to.have.been.calledWith(`Creating new CloudFormation stack 'myStack'...`);
-          expect(logger.log).to.have.been.calledWith(`New CloudFormation stack 'myStack' has been created!`);
-          expect(logger.debug).to.have.been.calledBefore(logger.log);
-        });
+    it('it waits for stackCreateComplete', async function() {
+      await expect(callFn()).to.be.fulfilled;
+      expect(client.awsClient.waitFor).to.have.been.calledWith('stackCreateComplete', { StackName: 'myStack' });
+      expect(logger.debug).to.have.been.calledWith(`Creating new CloudFormation stack 'myStack'...`);
+      expect(logger.log).to.have.been.calledWith(`New CloudFormation stack 'myStack' has been created!`);
+      expect(logger.debug).to.have.been.calledBefore(logger.log);
     });
 
     it('rejects when createStack fails', function() {
@@ -179,19 +177,17 @@ describe('Cloudformation client', function() {
   }
 
   function checkUpdateStack(callFn) {
-    it('it calls updateStack with adjusted options', function() {
-      return expect(callFn()).to.be.fulfilled
-        .then(() => expect(client.awsClient.updateStack).to.have.been.calledWith(expectedOptions));
+    it('it calls updateStack with adjusted options', async function() {
+      await expect(callFn()).to.be.fulfilled;
+      expect(client.awsClient.updateStack).to.have.been.calledWith(expectedOptions);
     });
 
-    it('it waits for stackUpdateComplete', function() {
-      return expect(callFn()).to.be.fulfilled
-        .then(() => {
-          expect(client.awsClient.waitFor).to.have.been.calledWith('stackUpdateComplete', { StackName: 'myStack' });
-          expect(logger.debug).to.have.been.calledWith(`Updating CloudFormation stack 'myStack'...`);
-          expect(logger.log).to.have.been.calledWith(`CloudFormation stack 'myStack' has been updated!`);
-          expect(logger.debug).to.have.been.calledBefore(logger.log);
-        });
+    it('it waits for stackUpdateComplete', async function() {
+      await expect(callFn()).to.be.fulfilled;
+      expect(client.awsClient.waitFor).to.have.been.calledWith('stackUpdateComplete', { StackName: 'myStack' });
+      expect(logger.debug).to.have.been.calledWith(`Updating CloudFormation stack 'myStack'...`);
+      expect(logger.log).to.have.been.calledWith(`CloudFormation stack 'myStack' has been updated!`);
+      expect(logger.debug).to.have.been.calledBefore(logger.log);
     });
 
     it('rejects when updateStack fails', function() {
@@ -202,16 +198,14 @@ describe('Cloudformation client', function() {
       return expect(callFn()).to.be.rejected;
     });
 
-    it('ignores unchanged stack', function() {
+    it('ignores unchanged stack', async function() {
       client.awsClient.updateStack.returns({
         promise: sinon.fake.rejects('No updates are to be performed')
       });
 
-      return expect(callFn()).to.be.fulfilled
-        .then(() => {
-          expect(client.awsClient.waitFor).to.not.have.been.called;
-          expect(logger.debug).to.have.been.calledWith(`No updates are to be performed to CloudFormation stack 'myStack'`);
-        });
+      await expect(callFn()).to.be.fulfilled;
+      expect(client.awsClient.waitFor).to.not.have.been.called;
+      expect(logger.debug).to.have.been.calledWith(`No updates are to be performed to CloudFormation stack 'myStack'`);
     });
   }
 
@@ -224,25 +218,21 @@ describe('Cloudformation client', function() {
   });
 
   describe('validateTemplate', function() {
-    it('resolves for valid template', function() {
-      return expect(client.validateTemplate()).to.be.fulfilled
-        .then(() => {
-          expect(client.awsClient.validateTemplate).to.have.been.calledWith({
-            TemplateBody: templateBody
-          })
-        });
+    it('resolves for valid template', async function() {
+      await expect(client.validateTemplate()).to.be.fulfilled;
+      expect(client.awsClient.validateTemplate).to.have.been.calledWith({
+        TemplateBody: templateBody
+      })
     });
 
-    it('rejects for invalid template', function() {
+    it('rejects for invalid template', async function() {
       client.awsClient.validateTemplate.returns({
         promise: sinon.fake.rejects('template error')
       });
-      return expect(client.validateTemplate()).to.be.rejected
-        .then(() => {
-          expect(client.awsClient.validateTemplate).to.have.been.calledWith({
-            TemplateBody: templateBody
-          })
-        });
+      await expect(client.validateTemplate()).to.be.rejected;
+      expect(client.awsClient.validateTemplate).to.have.been.calledWith({
+        TemplateBody: templateBody
+      })
     });
   });
 
