@@ -1,6 +1,6 @@
 # ember-cli-deploy-cloudformation
 
-[![Build Status](https://travis-ci.com/kaliber5/ember-cli-deploy-cloudformation.svg?branch=master)](https://travis-ci.com/kaliber5/ember-cli-deploy-cloudformation)
+[![Build Status](https://github.com/kaliber5/ember-cli-deploy-cloudformation/workflows/CI/badge.svg)](https://github.com/kaliber5/ember-cli-deploy-cloudformation/actions)
 [![Ember Observer Score](https://emberobserver.com/badges/ember-cli-deploy-cloudformation.svg)](https://emberobserver.com/addons/ember-cli-deploy-cloudformation)
 [![npm version](https://badge.fury.io/js/ember-cli-deploy-cloudformation.svg)](https://badge.fury.io/js/ember-cli-deploy-cloudformation)
 
