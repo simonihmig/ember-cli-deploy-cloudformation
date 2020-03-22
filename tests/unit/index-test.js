@@ -80,8 +80,8 @@ describe('Cloudformation plugin', function() {
       name: 'cloudformation'
     });
 
-    expect(plugin.configure).to.be.a.function;
-    expect(plugin.prepare).to.be.a.function;
+    expect(plugin.configure).to.be.a('function');
+    expect(plugin.prepare).to.be.a('function');
   });
 
   describe('configure', function() {
