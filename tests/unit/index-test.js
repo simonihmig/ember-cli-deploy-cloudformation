@@ -113,36 +113,32 @@ describe('Cloudformation plugin', function() {
       return expect(instance.setup(context)).to.be.fulfilled;
     });
 
-    it('errors on invalid template', function() {
+    it('errors on invalid template', async function() {
       let msg = 'invalid template';
       cfnClient.validateTemplate.rejects(msg);
 
       instance.beforeHook(context);
 
-      return expect(instance.setup(context)).to.be.rejected
-        .then(() => expect(mockUi.messages.pop()).to.include(msg));
+      await expect(instance.setup(context)).to.be.rejected;
+      expect(mockUi.messages.pop()).to.include(msg);
     });
 
   });
 
   describe('prepare', function() {
-    it('creates or updates stack', function() {
+    it('creates or updates stack', async function() {
       instance.beforeHook(context);
       instance.setup(context);
-      return expect(instance.prepare(context)).to.be.fulfilled
-        .then(() => {
-          expect(cfnClient.createOrUpdateStack).to.have.been.calledOnce;
-        })
+      await expect(instance.prepare(context)).to.be.fulfilled;
+      expect(cfnClient.createOrUpdateStack).to.have.been.calledOnce;
     });
 
-    it('adds outputs to context', function() {
+    it('adds outputs to context', async function() {
       instance.beforeHook(context);
       instance.setup(context);
-      return expect(instance.prepare(context)).to.be.fulfilled
-        .then(() => {
-          expect(context.cloudformation).to.exist;
-          expect(context.cloudformation).to.have.property('outputs', expectedOutputs);
-        })
+      await expect(instance.prepare(context)).to.be.fulfilled;
+      expect(context.cloudformation).to.exist;
+      expect(context.cloudformation).to.have.property('outputs', expectedOutputs);
     });
   });
 
