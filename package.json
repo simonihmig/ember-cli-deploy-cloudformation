@@ -23,7 +23,7 @@
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "ember-cli": "^3.18.0",
-    "eslint": "^7.2.0",
+    "eslint": "^7.3.0",
     "glob": "^7.1.6",
     "mocha": "^7.2.0",
     "sinon": "^9.0.2",
