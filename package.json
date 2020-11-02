@@ -26,7 +26,7 @@
     "eslint": "^7.12.1",
     "glob": "^7.1.6",
     "mocha": "^8.2.0",
-    "sinon": "^9.2.0",
+    "sinon": "^9.2.1",
     "sinon-chai": "^3.5.0"
   },
   "keywords": [
