@@ -22,7 +22,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "ember-cli": "^3.23.0",
+    "ember-cli": "^3.24.0",
     "eslint": "^7.17.0",
     "glob": "^7.1.6",
     "mocha": "^8.2.1",
