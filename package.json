@@ -16,7 +16,7 @@
   "author": "Simon Ihmig <ihmig@kaliber5.de>",
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.903.0",
+    "aws-sdk": "^2.907.0",
     "ember-cli-deploy-plugin": "^0.2.9"
   },
   "devDependencies": {
