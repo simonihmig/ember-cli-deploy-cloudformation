@@ -2,6 +2,13 @@
   "name": "ember-cli-deploy-cloudformation",
   "version": "0.2.0",
   "description": "An ember-cli-deploy plugin to create/update an AWS CloudFormation stack",
+  "keywords": [
+    "ember-addon",
+    "ember-cli-deploy-plugin"
+  ],
+  "repository": "https://github.com/kaliber5/ember-cli-deploy-cloudformation",
+  "license": "MIT",
+  "author": "Simon Ihmig <ihmig@kaliber5.de>",
   "directories": {
     "doc": "doc",
     "test": "tests"
@@ -9,12 +16,6 @@
   "scripts": {
     "test": "node tests/runner.js && ./node_modules/.bin/eslint index.js tests/**/*.js"
   },
-  "repository": "https://github.com/kaliber5/ember-cli-deploy-cloudformation",
-  "engines": {
-    "node": "14.x || >= 16"
-  },
-  "author": "Simon Ihmig <ihmig@kaliber5.de>",
-  "license": "MIT",
   "dependencies": {
     "aws-sdk": "^2.958.0",
     "ember-cli-deploy-plugin": "^0.2.9"
@@ -26,11 +27,30 @@
     "eslint": "^7.32.0",
     "glob": "^7.1.7",
     "mocha": "^8.4.0",
+    "release-it": "^14.2.1",
+    "release-it-lerna-changelog": "^3.1.0",
     "sinon": "^11.1.2",
     "sinon-chai": "^3.7.0"
   },
-  "keywords": [
-    "ember-addon",
-    "ember-cli-deploy-plugin"
-  ]
+  "engines": {
+    "node": "14.x || >= 16"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "release-it": {
+    "plugins": {
+      "release-it-lerna-changelog": {
+        "infile": "CHANGELOG.md",
+        "launchEditor": true
+      }
+    },
+    "git": {
+      "tagName": "v${version}"
+    },
+    "github": {
+      "release": true,
+      "tokenRef": "GITHUB_AUTH"
+    }
+  }
 }
