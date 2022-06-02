@@ -1,6 +1,6 @@
 {
   "name": "ember-cli-deploy-cloudformation",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "An ember-cli-deploy plugin to create/update an AWS CloudFormation stack",
   "keywords": [
     "ember-addon",
