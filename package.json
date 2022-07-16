@@ -24,7 +24,7 @@
     "chai": "4.3.6",
     "chai-as-promised": "7.1.1",
     "ember-cli": "4.5.0",
-    "eslint": "8.19.0",
+    "eslint": "8.20.0",
     "glob": "8.0.3",
     "mocha": "10.0.0",
     "release-it": "14.14.3",
